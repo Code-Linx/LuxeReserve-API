@@ -1,2 +1,2 @@
 # LuxeReserve-API
-A Node.js and Express-based backend for managing hotel room reservations. This system supports user authentication, room management, booking reservations, payment processing, and admin controls. It ensures secure role-based access, integrates with email notifications, and offers features like search, filters, and booking history
+The LuxeReserve API is a robust backend solution built with Node.js and Express to streamline hotel room reservation management. It features user authentication, room availability tracking, reservation booking, payment integration, and admin controls. With role-based access, email notifications, and advanced search capabilities, LuxeReserve ensures a secure and efficient booking experience for users and administrators alike.
