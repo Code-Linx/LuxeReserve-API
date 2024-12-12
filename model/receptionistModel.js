@@ -29,13 +29,45 @@ const receptionistSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    default: "receptionist",
+    default: "guest",
+  },
+  passwordConfirm: {
+    type: String,
+    required: [true, "Please confirm your password"],
+    validate: {
+      // Only runs this validation if the password is being modified or created
+      validator: function (el) {
+        // Only validate if password is new or modified
+        return el === this.password;
+      },
+      message: "Passwords are not the same!",
+    },
+  },
+
+  passwordChangedAt: Date, // Track when the password was changed
+  passwordResetCode: String,
+  passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
   },
   createdAt: {
     type: Date,
     default: Date.now,
   },
-  hotel: { type: mongoose.Schema.Types.ObjectId, ref: "Hotel" }, // Reference to the hotel they work for
+
+  isVerified: {
+    type: Boolean,
+    default: false, // Set to true after email verification
+  },
+
+  // Reference to the hotel managed by the admin
+  hotel: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Hotel",
+    required: [true, "Please associate an admin with a hotel"],
+  },
 });
 
 module.exports = mongoose.model("Receptionist", receptionistSchema);
