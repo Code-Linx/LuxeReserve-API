@@ -1,4 +1,11 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
+
+// Function to generate a random 6-digit code
+function generateSixDigitCode() {
+  return Math.floor(100000 + Math.random() * 900000).toString(); // Generates a 6-digit code
+}
 
 const guestSchema = new mongoose.Schema({
   first_name: {
@@ -29,7 +36,7 @@ const guestSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    default: "guest",
+    default: "user",
   },
   passwordConfirm: {
     type: String,
@@ -69,7 +76,74 @@ const guestSchema = new mongoose.Schema({
   emailVerificationExpires: {
     type: Date, // Code expiration time (e.g., valid for 24 hours)
   },
-  bookings: [{ type: mongoose.Schema.Types.ObjectId, ref: "Booking" }], // Reference to bookings made by the guest
 });
+
+// Middleware to hash the password before saving the user document
+guestSchema.pre("save", async function (next) {
+  // Only hash if the password is new or being modified
+  if (!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, 12);
+
+  // Remove passwordConfirm field after validation
+  this.passwordConfirm = undefined;
+  next();
+});
+
+// Middleware to set the passwordChangedAt timestamp when password is modified
+guestSchema.pre("save", function (next) {
+  if (!this.isModified("password") || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000; // Ensures the timestamp is slightly before JWT is issued
+  next();
+});
+
+// Method to check if the password is correct
+guestSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+// Method to generate and hash the email verification code
+guestSchema.methods.createEmailVerificationCode = function () {
+  const verificationCode = generateSixDigitCode(); // Generate a 6-digit code
+
+  // Hash the code using crypto and save it to the database
+  this.emailVerificationCode = crypto
+    .createHash("sha256")
+    .update(verificationCode)
+    .digest("hex");
+
+  this.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // Expires in 24 hours
+
+  return verificationCode; // Return the plain code to send via email
+};
+
+// Method to check if the password has been changed after a token was issued
+guestSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+
+    return JWTTimestamp < changedTimestamp;
+  }
+
+  // False means NOT changed
+  return false;
+};
+
+// Method to generate a password reset code
+guestSchema.methods.createPasswordResetCode = function () {
+  const resetCode = generateSixDigitCode(); // Generate a 6-digit code
+
+  this.passwordResetCode = resetCode; // Store the code in DB
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // Code expires in 10 minutes
+
+  return resetCode; // Return plain code to send in the email
+};
 
 module.exports = mongoose.model("Guest", guestSchema);

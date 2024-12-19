@@ -16,37 +16,3 @@ exports.getUserDashboard = catchAsync(async (req, res) => {
   });
 });
 
-exports.createReservation = async (req, res) => {
-  try {
-    const {
-      hotelName,
-      roomType,
-      roomNumber,
-      checkInDate,
-      checkOutDate,
-      numberOfGuests,
-    } = req.body;
-
-    // Create a new reservation with the provided details
-    const reservation = new Reservation({
-      user: req.user.id, // Assuming `req.user` is set by the `protect` middleware
-      hotelName,
-      roomType,
-      roomNumber,
-      checkInDate,
-      checkOutDate,
-      numberOfGuests,
-    });
-
-    // Save the reservation to the database
-    await reservation.save();
-
-    res.status(201).json({
-      message: "Reservation created successfully",
-      reservation,
-    });
-  } catch (error) {
-    console.error("Error creating reservation:", error.message);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
