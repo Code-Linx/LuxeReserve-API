@@ -1,0 +1,26 @@
+extends base.pug
+
+block content
+  h1 A New Hotel Has Been Added!
+  p Dear #{hotelName},
+
+  p The following hotel has been successfully added to LuxeReserve:
+  
+  ul
+    li Name: #{hotelName}
+
+    li Address: #{address}
+
+    li Contact: #{contactNumber}
+
+    li Email: #{hotelEmail}
+
+    li Description: #{description}
+
+    li Website: #{website}
+
+    li Amenities: #{amenities}
+
+    li Maximum Occupancy: #{maxOccupancy}
+
+  p Thank you for your contribution to LuxeReserve!

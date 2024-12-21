@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 // Hotel Schema
 const hotelSchema = new mongoose.Schema({
-  name: {
+  hotelName: {
     type: String,
     required: [true, "Please provide the hotel name"],
   },
@@ -14,7 +14,7 @@ const hotelSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide the hotel contact number"],
   },
-  email: {
+  hotelEmail: {
     type: String,
     required: [true, "Please provide the hotel email"],
     unique: true,

@@ -7,10 +7,19 @@ const { convert } = require("html-to-text");
 class Email {
   constructor(user, url) {
     // Accept loginDetails here
-    this.to = user.email;
-    this.name = user.name;
+    this.to = user.email || user.hotelEmail;
+    this.first_name = user.first_name;
+    this.newTransport;
     this.from = `LuxeReserve-Admin <${process.env.EMAIL_FROM}>`;
     this.url = url;
+    this.hotelName = user.hotelName;
+    this.hotelEmail = user.hotelEmail;
+    this.address = user.address;
+    this.contactNumber = user.contactNumber;
+    this.description = user.description;
+    this.website = user.website;
+    this.amenities = user.amenities;
+    this.maxOccupancy = user.maxOccupancy;
   }
 
   newTransport() {
@@ -31,8 +40,16 @@ class Email {
   async send(template, subject, data = {}) {
     // 1) Render HTML based on a pug template
     const html = pug.renderFile(`${__dirname}/../views/email/${template}.pug`, {
-      name: this.name,
+      first_name: this.first_name,
       url: this.url,
+      hotelName: this.hotelName,
+      hotelEmail: this.hotelEmail,
+      contactNumber: this.contactNumber,
+      address: this.address,
+      description: this.description,
+      website: this.website,
+      amenities: this.amenities,
+      maxOccupancy: this.maxOccupancy,
       subject,
       ...data, // Spread the additional data into the template variables
     });
@@ -60,6 +77,17 @@ class Email {
   // Send password reset code email
   async sendPasswordReset() {
     await this.send("sendResetCode", "Your Password Reset Code");
+  }
+
+  // Function to send a receptionist welcome email
+  async sendReceptionistWelcome(hotelName, tempPassword) {
+    await this.send("receptionistWelcome", "Welcome to LuxeServe", {
+      hotelName,
+      tempPassword,
+    });
+  }
+  async sendHotelAdded(newHotel) {
+    await this.send("hotelAdded", "New Hotel Added to LuxeReserve");
   }
 }
 

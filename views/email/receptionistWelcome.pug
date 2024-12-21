@@ -1,0 +1,15 @@
+extends base.pug
+
+block content
+  h1 Welcome to LuxeReserve, #{firstName} #{lastName}!
+  p
+    | You have been added as a receptionist for the hotel "#{hotelName}".
+  p
+    | Your login credentials are as follows:
+  ul
+    li Email: #{email}
+    li Temporary Password: #{tempPassword}
+  p
+    | Please log in and change your password immediately for security purposes.
+  p Best regards,
+  p LuxeReserve Team

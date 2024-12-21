@@ -1,6 +1,6 @@
 const express = require("express");
 const authController = require("../controllers/adminAuthController");
-const userController = require("../controllers/adminController");
+const adminController = require("../controllers/adminController");
 
 const router = express.Router();
 
@@ -29,5 +29,6 @@ router.post("/log-out", authController.logout);
 //PROTECTED ROUTE
 router.use(authController.protect);
 router.use(authController.restrictTo("admin"));
+router.post("/add-hotel", adminController.addHotel);
 
 module.exports = router;
