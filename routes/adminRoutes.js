@@ -30,5 +30,6 @@ router.post("/log-out", authController.logout);
 router.use(authController.protect);
 router.use(authController.restrictTo("admin"));
 router.post("/add-hotel", adminController.addHotel);
+router.post("/add-receptionist", adminController.addReceptionist);
 
 module.exports = router;

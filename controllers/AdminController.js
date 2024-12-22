@@ -56,10 +56,10 @@ exports.addHotel = catchAsync(async (req, res, next) => {
 exports.addReceptionist = catchAsync(async (req, res, next) => {
   try {
     // 1. Validate input data
-    const { name, email, phoneNumber, hotelId } = req.body;
+    const { first_name, last_name, email, phoneNumber, hotelName } = req.body;
 
     // Ensure required fields are provided
-    if (!name || !email || !hotelId) {
+    if (!first_name || !last_name || !email || !hotelName || !phoneNumber) {
       return next(new AppError("Please provide all required fields", 400));
     }
 
@@ -71,16 +71,26 @@ exports.addReceptionist = catchAsync(async (req, res, next) => {
       );
     }
 
+    // Find the hotel by name
+    const hotel = await Hotel.findOne({ hotelName });
+    if (!hotel) {
+      return next(new AppError("The specified hotel does not exist.", 400));
+    }
+
     // 3. Generate a temporary password
     const tempPassword = Math.random().toString(36).slice(-8);
 
     // 4. Create the receptionist
     const newReceptionist = await Receptionist.create({
-      name,
+      first_name,
+      last_name,
       email,
       phoneNumber,
-      hotel: hotelId,
-      password: tempPassword, // Save the temporary password (hashed, if applicable)
+      tempPassword,
+      hotelName,
+      password: tempPassword,
+      passwordConfirm: tempPassword, // Save the temporary password (hashed, if applicable)
+      hotel: hotel._id, // Associate with the hotel
     });
 
     // 5. Send email to the receptionist with their details
@@ -88,7 +98,15 @@ exports.addReceptionist = catchAsync(async (req, res, next) => {
       "receptionistWelcome",
       "Welcome to LuxeReserve"
     );
-
+    // Schedule deletion of tempPassword after 1 minute
+    setTimeout(async () => {
+      await Receptionist.findByIdAndUpdate(newReceptionist._id, {
+        tempPassword: null,
+      });
+      console.log(
+        `Temporary password for ${newReceptionist.email} has been removed.`
+      );
+    }, 30000); // 30000 ms = 30 seconds
     // 6. Return a success response
     res.status(201).json({
       status: "success",
@@ -97,6 +115,6 @@ exports.addReceptionist = catchAsync(async (req, res, next) => {
       },
     });
   } catch (err) {
-    next(err);
+    console.log(err.message);
   }
 });

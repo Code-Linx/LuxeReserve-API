@@ -9,6 +9,9 @@ class Email {
     // Accept loginDetails here
     this.to = user.email || user.hotelEmail;
     this.first_name = user.first_name;
+    this.last_name = user.last_name;
+    this.phoneNumber = user.phoneNumber;
+    this.tempPassword = user.tempPassword;
     this.newTransport;
     this.from = `LuxeReserve-Admin <${process.env.EMAIL_FROM}>`;
     this.url = url;
@@ -41,6 +44,8 @@ class Email {
     // 1) Render HTML based on a pug template
     const html = pug.renderFile(`${__dirname}/../views/email/${template}.pug`, {
       first_name: this.first_name,
+      last_name: this.last_name,
+      tempPassword: this.tempPassword,
       url: this.url,
       hotelName: this.hotelName,
       hotelEmail: this.hotelEmail,
@@ -80,12 +85,10 @@ class Email {
   }
 
   // Function to send a receptionist welcome email
-  async sendReceptionistWelcome(hotelName, tempPassword) {
-    await this.send("receptionistWelcome", "Welcome to LuxeServe", {
-      hotelName,
-      tempPassword,
-    });
+  async sendReceptionistWelcome() {
+    await this.send("receptionistWelcome", "Welcome to LuxeServe");
   }
+
   async sendHotelAdded(newHotel) {
     await this.send("hotelAdded", "New Hotel Added to LuxeReserve");
   }
