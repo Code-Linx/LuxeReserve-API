@@ -31,5 +31,8 @@ router.use(authController.protect);
 router.use(authController.restrictTo("admin"));
 router.post("/add-hotel", adminController.addHotel);
 router.post("/add-receptionist", adminController.addReceptionist);
+router.get("/receptionists", adminController.getAllReceptionists);
+router.get("/:id/receptionists/", adminController.getReceptionistById);
+router.post("/room", adminController.createRoom);
 
 module.exports = router;

@@ -1,5 +1,6 @@
 const Receptionist = require("../model/receptionistModel");
 const Hotel = require("../model/hotelModel");
+const Room = require("../model/roomModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const Email = require("../utils/email");
@@ -116,5 +117,102 @@ exports.addReceptionist = catchAsync(async (req, res, next) => {
     });
   } catch (err) {
     console.log(err.message);
+  }
+});
+
+// Controller Function to Get All Receptionists
+exports.getAllReceptionists = catchAsync(async (req, res, next) => {
+  try {
+    // Find all users with the role of 'receptionist'
+    const receptionists = await Receptionist.find({ role: "Receptionist" });
+
+    if (!receptionists || receptionists.length === 0) {
+      return res.status(404).json({
+        status: "fail",
+        message: "No receptionists found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      results: receptionists.length,
+      data: {
+        receptionists,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Controller Function to Get a Receptionist by ID
+exports.getReceptionistById = catchAsync(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // Find the receptionist by ID
+    const receptionist = await Receptionist.findById({
+      _id: id,
+      role: "receptionist",
+    });
+
+    if (!receptionist) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Receptionist not found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        receptionist,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Controller function for creating a room
+exports.createRoom = catchAsync(async (req, res, next) => {
+  try {
+    // 1. Extract room details from the request body
+    const {
+      roomType,
+      pricePerNight,
+      availabilityStatus,
+      amenities,
+      maxOccupancy,
+    } = req.body;
+
+    // 2. Validate required fields
+    if (!roomType || !pricePerNight || !maxOccupancy) {
+      return next(
+        new AppError(
+          "Room type, price per night, and maximum occupancy are required.",
+          400
+        )
+      );
+    }
+
+    // 3. Create the room in the database
+    const newRoom = await Room.create({
+      roomType,
+      pricePerNight,
+      availabilityStatus,
+      amenities,
+      maxOccupancy,
+    });
+
+    // 4. Send a success response
+    res.status(201).json({
+      status: "success",
+      data: {
+        room: newRoom,
+      },
+    });
+  } catch (err) {
+    next(err); // Pass any error to the global error handler
   }
 });
