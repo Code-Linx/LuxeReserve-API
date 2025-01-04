@@ -216,3 +216,91 @@ exports.createRoom = catchAsync(async (req, res, next) => {
     next(err); // Pass any error to the global error handler
   }
 });
+
+exports.updateRoomDetails = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  // 1. Extract room details from the request body
+  const {
+    roomType,
+    pricePerNight,
+    availabilityStatus,
+    amenities,
+    maxOccupancy,
+  } = req.body;
+
+  // 2. Find the room by ID
+  const room = await Room.findByIdAndUpdate({ _id: id });
+
+  if (!room) {
+    return next(new AppError("Room not found", 404));
+  }
+
+  // 3. Update room details
+  if (roomType) room.roomType = roomType;
+  if (pricePerNight) room.pricePerNight = pricePerNight;
+  if (availabilityStatus !== undefined)
+    room.availabilityStatus = availabilityStatus;
+  if (amenities) room.amenities = amenities;
+  if (maxOccupancy) room.maxOccupancy = maxOccupancy;
+
+  room.updatedAt = Date.now(); // Update the timestamp
+
+  // 4. Save the updated room
+  const updatedRoom = await room.save();
+
+  // 5. Return the updated room
+  res.status(200).json({
+    status: "success",
+    data: {
+      room: updatedRoom,
+    },
+  });
+});
+
+exports.getAllRooms = catchAsync(async (req, res, next) => {
+  const rooms = await Room.find();
+
+  res.status(200).json({
+    status: "success",
+    results: rooms.length,
+    data: {
+      rooms,
+    },
+  });
+});
+
+exports.getRoomById = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  const room = await Room.findById({ _id: id });
+
+  if (!room) {
+    return next(new AppError("Room not found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      room,
+    },
+  });
+});
+
+exports.deleteRoom = catchAsync(async (req, res, next) => {
+  const { roomId } = req.params;
+
+  // Find and delete the room
+  const room = await Room.findByIdAndDelete({ _id: roomId });
+
+  // If the room does not exist
+  if (!room) {
+    return next(new AppError("Room not found", 404));
+  }
+
+  // Respond with success
+  res.status(204).json({
+    status: "success",
+    data: null, // No content in the response for a successful deletion
+  });
+});

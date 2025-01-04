@@ -34,5 +34,9 @@ router.post("/add-receptionist", adminController.addReceptionist);
 router.get("/receptionists", adminController.getAllReceptionists);
 router.get("/:id/receptionists/", adminController.getReceptionistById);
 router.post("/room", adminController.createRoom);
+router.patch("/:id/room", adminController.updateRoomDetails);
+router.get("/all-room", adminController.getAllRooms);
+router.get("/:id/roombyId", adminController.getRoomById);
+router.delete("/:roomId/delete-room", adminController.deleteRoom);
 
 module.exports = router;
