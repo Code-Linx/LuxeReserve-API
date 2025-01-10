@@ -1,6 +1,7 @@
 const { Strategy: JwtStrategy, ExtractJwt } = require("passport-jwt");
 const User = require("../model/guestModel");
 const Admin = require("../model/adminModel");
+const Receptionist = require("../model/receptionistModel");
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -37,6 +38,22 @@ module.exports = (passport) => {
         const admin = await Admin.findById(jwt_payload.id);
         if (admin) {
           return done(null, admin);
+        } else {
+          return done(null, false);
+        }
+      } catch (err) {
+        return done(err, false);
+      }
+    })
+  );
+
+  passport.use(
+    "receptionist",
+    new JwtStrategy(opts, async (jwt_payload, done) => {
+      try {
+        const receptionist = await Receptionist.findById(jwt_payload.id);
+        if (receptionist) {
+          return done(null, receptionist);
         } else {
           return done(null, false);
         }

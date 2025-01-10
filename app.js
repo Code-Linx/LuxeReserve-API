@@ -5,6 +5,7 @@ const AppError = require("./utils/appError");
 const globalErrorHandler = require("./middlewares/errorHandler");
 const userRouter = require("./routes/userRoutes");
 const adminRouter = require("./routes/adminRoutes");
+const receptionistRouter = require("./routes/receptionistRoutes");
 const passport = require("passport");
 const passportConfig = require("./middlewares/protect");
 
@@ -30,6 +31,7 @@ passportConfig(passport);
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/receptionist", receptionistRouter);
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
