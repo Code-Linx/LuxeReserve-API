@@ -38,39 +38,7 @@ const createSendToken = (user, statusCode, res) => {
   });
 };
 
-exports.register = catchAsync(async (req, res, next) => {
-  try {
-    console.log(req.body);
-    // 1. Check if the user already exists
-    const user = await User.findOne({ email: req.body.email });
-    if (user) {
-      return next(new AppError("User already exists", 400));
-    }
 
-    // 2. Create new user without saving it yet
-    const newUser = await User.create({
-      first_name: req.body.first_name,
-      last_name: req.body.last_name,
-      email: req.body.email,
-      password: req.body.password,
-      passwordConfirm: req.body.passwordConfirm,
-    });
-
-    // 3. Generate Email Verification Code
-    const verificationCode = await newUser.createEmailVerificationCode();
-
-    // 4. Send Verification Code (via email or any other method)
-    await new Email(newUser, verificationCode).sendEmailVerification();
-
-    // 5. Save the user with the new fields
-    await newUser.save({ validateBeforeSave: false }); // Save the user again to persist the verification code and expiration
-
-    // 6. Send response
-    createSendToken(newUser, 201, res);
-  } catch (error) {
-    console.log(error.message);
-  }
-});
 
 // Create a rate limiter middleware for resend verification route
 exports.resendVerificationLimiter = rateLimit({

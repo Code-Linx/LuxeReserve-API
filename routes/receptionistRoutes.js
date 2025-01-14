@@ -10,6 +10,9 @@ router.post("/sign-out", authController.logout);
 router.use(authController.protect);
 
 router.get("/room", receptionistController.getAllRooms);
+router.get("/available-rooms", receptionistController.getAvailableRooms);
+
+router.post("/reservations", receptionistController.createReservation);
 
 router.patch("/:roomId", receptionistController.updateRoomStatus);
 

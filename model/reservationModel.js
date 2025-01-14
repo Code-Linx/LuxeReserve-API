@@ -1,28 +1,30 @@
 const mongoose = require("mongoose");
 
 const reservationSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Guest",
-    required: true,
+  guestName: {
+    type: String,
+    required: [true, "Please provide the guest's name"],
   },
-  roomId: {
-    type: mongoose.Schema.Types.ObjectId,
+  guestEmail: {
+    type: String,
+    required: [true, "Please provide the guest's email"],
+  },
+  guestPhoneNumber: {
+    type: String,
+    required: [true, "Please provide the guest's phone number"],
+  },
+  room: {
+    type: mongoose.Schema.ObjectId,
     ref: "Room",
-    required: true,
+    required: [true, "Please specify the room for the reservation"],
   },
   checkInDate: {
     type: Date,
-    required: [true, "Please specify the check-in date"],
+    required: [true, "Please provide a check-in date"],
   },
   checkOutDate: {
     type: Date,
-    required: [true, "Please specify the check-out date"],
-  },
-  status: {
-    type: String,
-    enum: ["booked", "cancelled", "completed"],
-    default: "booked",
+    required: [true, "Please provide a check-out date"],
   },
   paymentStatus: {
     type: String,
@@ -32,9 +34,6 @@ const reservationSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
   },
 });
 
