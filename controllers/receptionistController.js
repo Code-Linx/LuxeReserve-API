@@ -102,3 +102,24 @@ exports.createReservation = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.getAllReservations = catchAsync(async (req, res, next) => {
+  // Fetch all reservations from the database
+  const reservations = await Reservation.find().populate(
+    "room",
+    "roomType pricePerNight"
+  );
+
+  if (!reservations || reservations.length === 0) {
+    return next(new AppError("No reservations found", 404));
+  }
+
+  // Return the reservations
+  res.status(200).json({
+    status: "success",
+    results: reservations.length,
+    data: {
+      reservations,
+    },
+  });
+});

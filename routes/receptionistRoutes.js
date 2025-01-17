@@ -11,6 +11,7 @@ router.use(authController.protect);
 
 router.get("/room", receptionistController.getAllRooms);
 router.get("/available-rooms", receptionistController.getAvailableRooms);
+router.get("/all-reservations", receptionistController.getAllReservations);
 
 router.post("/reservations", receptionistController.createReservation);
 
