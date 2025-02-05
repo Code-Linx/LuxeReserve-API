@@ -123,3 +123,25 @@ exports.getAllReservations = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.getReservationById = catchAsync(async (req, res, next) => {
+  const { reservationId } = req.params;
+
+  // Find reservation by ID and populate room details
+  const reservation = await Reservation.findById(reservationId).populate(
+    "room",
+    "roomType pricePerNight"
+  );
+
+  if (!reservation) {
+    return next(new AppError("Reservation not found", 404));
+  }
+
+  // Return the reservation details
+  res.status(200).json({
+    status: "success",
+    data: {
+      reservation,
+    },
+  });
+});

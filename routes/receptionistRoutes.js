@@ -14,6 +14,7 @@ router.get("/available-rooms", receptionistController.getAvailableRooms);
 router.get("/all-reservations", receptionistController.getAllReservations);
 
 router.post("/reservations", receptionistController.createReservation);
+router.get("/:id/reservations,", receptionistController.getReservationById);
 
 router.patch("/:roomId", receptionistController.updateRoomStatus);
 
