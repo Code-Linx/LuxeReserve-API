@@ -145,3 +145,25 @@ exports.getReservationById = catchAsync(async (req, res, next) => {
     },
   });
 });
+exports.updateReservation = catchAsync(async (req, res, next) => {
+  const { reservationId } = req.params;
+  const { checkInDate, checkOutDate, paymentStatus } = req.body;
+
+  // Find and update the reservation
+  const updatedReservation = await Reservation.findByIdAndUpdate(
+    reservationId,
+    { checkInDate, checkOutDate, paymentStatus, updatedAt: Date.now() },
+    { new: true, runValidators: true }
+  );
+
+  if (!updatedReservation) {
+    return next(new AppError("Reservation not found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      reservation: updatedReservation,
+    },
+  });
+});
