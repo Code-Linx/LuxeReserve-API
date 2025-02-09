@@ -16,3 +16,20 @@ exports.getUserDashboard = catchAsync(async (req, res) => {
   });
 });
 
+exports.getAvailableRooms = catchAsync(async (req, res, next) => {
+  // Find available rooms
+  const availableRooms = await Room.find({ availabilityStatus: true });
+
+  // If no available rooms, return an error
+  if (!availableRooms.length) {
+    return next(new AppError("No available rooms at the moment", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    results: availableRooms.length,
+    data: {
+      rooms: availableRooms,
+    },
+  });
+});
