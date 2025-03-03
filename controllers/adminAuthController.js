@@ -41,14 +41,15 @@ const createSendToken = (user, statusCode, res) => {
 exports.register = catchAsync(async (req, res, next) => {
   try {
     console.log(req.body);
+    
     // 1. Check if the user already exists
-    const admin = await Admin.findOne({ email: req.body.email });
-    if (admin) {
+    const existingAdmin = await Admin.findOne({ email: req.body.email });
+    if (existingAdmin) {
       return next(new AppError("User already exists", 400));
     }
 
-    // 2. Create new user without saving it yet
-    const newUser = await Admin.create({
+    // 2. Create a new user instance but do not save yet
+    const newUser = new Admin({
       first_name: req.body.first_name,
       last_name: req.body.last_name,
       email: req.body.email,
@@ -59,18 +60,24 @@ exports.register = catchAsync(async (req, res, next) => {
     // 3. Generate Email Verification Code
     const verificationCode = await newUser.createEmailVerificationCode();
 
-    // 4. Send Verification Code (via email or any other method)
-    await new Email(newUser, verificationCode).sendEmailVerification();
+    // 4. Send Verification Email
+    try {
+      await new Email(newUser, verificationCode).sendEmailVerification();
+    } catch (error) {
+      console.log(error)
+      return next(new AppError("Failed to send verification email. Please try again later.", 500));
+    }
 
-    // 5. Save the user with the new fields
-    await newUser.save({ validateBeforeSave: false }); // Save the user again to persist the verification code and expiration
+    // 5. Save the user only if email is sent successfully
+    await newUser.save({ validateBeforeSave: false });
 
     // 6. Send response
     createSendToken(newUser, 201, res);
   } catch (error) {
-    console.log(error.message);
+    return next(new AppError(error.message, 500));
   }
 });
+
 
 // Create a rate limiter middleware for resend verification route
 exports.resendVerificationLimiter = rateLimit({
