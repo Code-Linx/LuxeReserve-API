@@ -41,7 +41,7 @@ const createSendToken = (user, statusCode, res) => {
 exports.register = catchAsync(async (req, res, next) => {
   try {
     console.log(req.body);
-    
+
     // 1. Check if the user already exists
     const existingAdmin = await Admin.findOne({ email: req.body.email });
     if (existingAdmin) {
@@ -64,8 +64,13 @@ exports.register = catchAsync(async (req, res, next) => {
     try {
       await new Email(newUser, verificationCode).sendEmailVerification();
     } catch (error) {
-      console.log(error)
-      return next(new AppError("Failed to send verification email. Please try again later.", 500));
+      console.log(error);
+      return next(
+        new AppError(
+          "Failed to send verification email. Please try again later.",
+          500
+        )
+      );
     }
 
     // 5. Save the user only if email is sent successfully
@@ -77,7 +82,6 @@ exports.register = catchAsync(async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 });
-
 
 // Create a rate limiter middleware for resend verification route
 exports.resendVerificationLimiter = rateLimit({
