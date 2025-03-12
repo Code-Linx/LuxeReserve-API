@@ -26,7 +26,7 @@ router.post(
 );
 
 //PROTECTED ROUTE
-//router.use(authController.protect);
+router.use(authController.protect);
 router.use(authController.restrictTo("admin"));
 router.post("/add-hotel", adminController.addHotel);
 router.post("/add-receptionist", adminController.addReceptionist);

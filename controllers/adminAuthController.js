@@ -180,6 +180,9 @@ exports.protect = catchAsync(async (req, res, next) => {
     "admin",
     { session: false },
     async (err, user, info) => {
+      /*  console.log("Error:", err);
+      console.log("User:", user);
+      console.log("Info:", info); */
       if (err || !user) {
         return next(
           new AppError(
