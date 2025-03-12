@@ -262,6 +262,13 @@ exports.updateRoomDetails = catchAsync(async (req, res, next) => {
 exports.getAllRooms = catchAsync(async (req, res, next) => {
   const rooms = await Room.find();
 
+  if (rooms.length === 0) {
+    return res.status(200).json({
+      status: "success",
+      results: rooms.length,
+      message: "No rooms Avaliable at the moments",
+    });
+  }
   res.status(200).json({
     status: "success",
     results: rooms.length,
