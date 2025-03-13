@@ -6,6 +6,11 @@ const AppError = require("../utils/appError");
 exports.getAllRooms = catchAsync(async (req, res, next) => {
   const rooms = await Room.find();
 
+  // 2. Check if there are available rooms
+  if (availableRooms.length === 0) {
+    return next(new AppError("No available rooms at the moment", 404));
+  }
+
   res.status(200).json({
     status: "success",
     results: rooms.length,
