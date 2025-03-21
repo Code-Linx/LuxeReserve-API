@@ -1,6 +1,7 @@
 const Receptionist = require("../model/receptionistModel");
 const Hotel = require("../model/hotelModel");
 const Room = require("../model/roomModel");
+const Reservation = require("../model/reservationModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const Email = require("../utils/email");
@@ -310,5 +311,26 @@ exports.deleteRoom = catchAsync(async (req, res, next) => {
   res.status(204).json({
     status: "success",
     data: null, // No content in the response for a successful deletion
+  });
+});
+
+exports.getAllReservations = catchAsync(async (req, res, next) => {
+  // Fetch all reservations from the database
+  const reservations = await Reservation.find().populate(
+    "room",
+    "roomType pricePerNight"
+  );
+
+  if (!reservations || reservations.length === 0) {
+    return next(new AppError("No reservations found", 404));
+  }
+
+  // Return the reservations
+  res.status(200).json({
+    status: "success",
+    results: reservations.length,
+    data: {
+      reservations,
+    },
   });
 });
