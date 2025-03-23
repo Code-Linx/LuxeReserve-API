@@ -314,6 +314,8 @@ exports.deleteRoom = catchAsync(async (req, res, next) => {
   });
 });
 
+
+
 exports.getAllReservations = catchAsync(async (req, res, next) => {
   // Fetch all reservations from the database
   const reservations = await Reservation.find().populate(
